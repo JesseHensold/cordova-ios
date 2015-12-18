@@ -144,9 +144,11 @@ function getXcodeArgs(projectName, projectPath, configuration, isDevice) {
     if (isDevice) {
         xcodebuildArgs = [
             '-xcconfig', path.join(__dirname, '..', 'build-' + configuration.toLowerCase() + '.xcconfig'),
-            '-project', projectName + '.xcodeproj',
+            //'-project', projectName + '.xcodeproj',
+            '-workspace', projectName + '.xcworkspace',
             'ARCHS=armv7 arm64',
-            '-target', projectName,
+            //'-target', projectName,
+            '-scheme', projectName,
             '-configuration', configuration,
             '-sdk', 'iphoneos',
             'build',
@@ -157,9 +159,11 @@ function getXcodeArgs(projectName, projectPath, configuration, isDevice) {
     } else { // emulator
         xcodebuildArgs = [
             '-xcconfig', path.join(__dirname, '..', 'build-' + configuration.toLowerCase() + '.xcconfig'),
-            '-project', projectName + '.xcodeproj',
+            //'-project', projectName + '.xcodeproj',
+            '-workspace', projectName + '.xcworkspace',
             'ARCHS=i386',
-            '-target', projectName ,
+            //'-target', projectName ,
+            '-scheme', projectName,
             '-configuration', configuration,
             '-sdk', 'iphonesimulator',
             'build',
