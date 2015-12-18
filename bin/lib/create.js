@@ -130,6 +130,7 @@ function relpath(_path, start) {
     return path.relative(path.resolve(start), path.resolve(_path));
 }
 
+
 /*
  * Creates a new iOS project with the following options:
  *
@@ -198,6 +199,11 @@ exports.createProject = function(project_path, package_name, project_name, opts,
     shell.sed('-i', /__PROJECT_NAME__/g, project_name_esc, path.join(r, project_name+'-Info.plist'));
     shell.sed('-i', /__PROJECT_NAME__/g, project_name_esc, path.join(r, project_name+'-Prefix.pch'));
     shell.sed('-i', /--ID--/g, package_name, path.join(r, project_name+'-Info.plist'));
+
+
+    /*Workspace and Cocoapod Setup*/
+    shell.mv(path.join(r, 'Podfile'), path.join(r, 'Podfile'));
+    shell.sed('-i', /__PROJECT_NAME__/g, project_name, path.join(r, 'Podfile'));
 
     //CordovaLib stuff
     copyJsAndCordovaLib(project_path, project_name, use_shared);
