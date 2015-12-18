@@ -202,8 +202,10 @@ exports.createProject = function(project_path, package_name, project_name, opts,
 
 
     /*Workspace and Cocoapod Setup*/
+
     console.log(project_name);
     console.log(path.join(project_path, 'Podfile'))
+    shell.cp('-f', path.join(project_template_dir, 'Podfile'), project_path);
     shell.sed('-i', /__PROJECT_NAME__/g, project_name, path.join(project_path, 'Podfile'));
 
     //CordovaLib stuff
