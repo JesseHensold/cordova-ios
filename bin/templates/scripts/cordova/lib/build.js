@@ -152,10 +152,12 @@ function getXcodeArgs(projectName, projectPath, configuration, isDevice) {
     var xcodebuildArgs;
     if (isDevice) {
         xcodebuildArgs = [
-            '-xcconfig', path.join(__dirname, '..', 'build-' + configuration.toLowerCase() + '.xcconfig'),
-            '-project', projectName + '.xcodeproj',
+            //'-xcconfig', path.join(__dirname, '..', 'build-' + configuration.toLowerCase() + '.xcconfig'),
+            //'-project', projectName + '.xcodeproj',
+            '-workspace', path.join(projectPath, '..', projectName + '.xcworkspace'),
             'ARCHS=armv7 arm64',
-            '-target', projectName,
+            //'-target', projectName,
+            '-scheme', projectName,
             '-configuration', configuration,
             '-sdk', 'iphoneos',
             'build',
@@ -165,10 +167,12 @@ function getXcodeArgs(projectName, projectPath, configuration, isDevice) {
         ];
     } else { // emulator
         xcodebuildArgs = [
-            '-xcconfig', path.join(__dirname, '..', 'build-' + configuration.toLowerCase() + '.xcconfig'),
-            '-project', projectName + '.xcodeproj',
+            //'-xcconfig', path.join(__dirname, '..', 'build-' + configuration.toLowerCase() + '.xcconfig'),
+            //'-project', projectName + '.xcodeproj',
+            '-workspace', path.join(projectPath, '..', projectName + '.xcworkspace'),
             'ARCHS=i386',
-            '-target', projectName ,
+            //'-target', projectName ,
+            '-scheme', projectName ,
             '-configuration', configuration,
             '-sdk', 'iphonesimulator',
             'build',
@@ -177,6 +181,7 @@ function getXcodeArgs(projectName, projectPath, configuration, isDevice) {
             'SHARED_PRECOMPS_DIR=' + path.join(projectPath, 'build', 'sharedpch')
         ];
     }
+    console.log(xcodebuildArgs.join(' '));
     return xcodebuildArgs;
 }
 

@@ -1,0 +1,13 @@
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://git.target.com/tgtpods/Specs.git'
+use_frameworks!
+platform :ios, '8.0'
+workspace '__PROJECT_NAME__'
+
+target '__PROJECT_NAME__' do
+
+end
+
+target 'CordovaLib' do
+xcodeproj 'CordovaLib/CordovaLib'
+end

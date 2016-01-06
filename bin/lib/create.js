@@ -23,7 +23,10 @@ var shell = require('shelljs'),
     Q = require ('q'),
     path = require('path'),
     fs = require('fs'),
-    ROOT = path.join(__dirname, '..', '..');
+    ROOT = path.join(__dirname, '..', '..'),
+    xcode = require('xcode'),
+    projectPath,
+    myProj;
 
 function createHelp() {
     console.log('Usage: $0 [--link] [--cli] <path_to_new_project> <package_name> <project_name> [<project_template_dir>]');
@@ -170,6 +173,11 @@ exports.createProject = function(project_path, package_name, project_name, opts)
         shell.cp('-rf', path.join(project_template_dir, '__NON-CLI__.xcodeproj'), project_path);
         shell.mv(path.join(project_path, '__NON-CLI__.xcodeproj'), path.join(project_path, project_name+'.xcodeproj'));
     }
+    /*addition to copy workspace*/
+    shell.cp('-rf', path.join(project_template_dir, '__PROJECT_NAME__.xcworkspace'), project_path);
+    shell.mv(path.join(project_path, '__PROJECT_NAME__.xcworkspace'), path.join(project_path, project_name+'.xcworkspace'));
+
+
     shell.cp('-rf', path.join(project_template_dir, '__PROJECT_NAME__'), project_path);
     shell.mv(path.join(project_path, '__PROJECT_NAME__'), path.join(project_path, project_name));
 
@@ -177,6 +185,9 @@ exports.createProject = function(project_path, package_name, project_name, opts)
     shell.mv(path.join(r, '__PROJECT_NAME__-Info.plist'), path.join(r, project_name+'-Info.plist'));
     shell.mv(path.join(r, '__PROJECT_NAME__-Prefix.pch'), path.join(r, project_name+'-Prefix.pch'));
     shell.mv(path.join(r, 'gitignore'), path.join(r, '.gitignore'));
+
+    /*copy podfile*/
+    shell.cp('-f', path.join(project_template_dir, 'Podfile'), project_path);
 
     /*replace __PROJECT_NAME__ and --ID-- with ACTIVITY and ID strings, respectively, in:
      *
@@ -198,10 +209,24 @@ exports.createProject = function(project_path, package_name, project_name, opts)
     shell.sed('-i', /__PROJECT_NAME__/g, project_name_esc, path.join(r, project_name+'-Prefix.pch'));
     shell.sed('-i', /--ID--/g, package_name, path.join(r, project_name+'-Info.plist'));
 
+    /*update workspace*/
+    shell.sed('-i', /__PROJECT_NAME__/g, project_name_esc, path.join(r+'.xcworkspace', 'contents.xcworkspacedata'));
+    /*update podfile*/
+    shell.sed('-i', /__PROJECT_NAME__/g, project_name_esc, path.join(project_path, 'Podfile'));
+
     //CordovaLib stuff
     copyJsAndCordovaLib(project_path, project_name, use_shared);
     copyScripts(project_path);
 
+    /*import pod xcconfig into cordova's*/
+    console.log("Updating "+path.join(project_path,'cordova', 'build-debug.xcconfig'))
+    shell.sed('-i', /__PROJECT_NAME__/g, project_name_esc, path.join(project_path,'cordova', 'build-debug.xcconfig'));
+
+    shell.cd('platforms/ios',function(code,output){
+        console.log('Exit code:', code);
+        console.log('Program output:', output);
+    });
+    shell.exec('pod install');
     console.log(generateDoneMessage('create', use_shared));
     return Q.resolve();
 };
@@ -225,6 +250,9 @@ function generateDoneMessage(type, link) {
     return msg;
 }
 
+function move_to_workspace(){
+
+}
 function update_cordova_subproject(argv) {
     if (argv.length < 1 || argv.length > 2)
     {
